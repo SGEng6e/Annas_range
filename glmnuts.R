@@ -111,8 +111,8 @@ Cmcmc <- compileNimble(Rmcmc, project = Rmodel)
 samples <- runMCMC(
   Cmcmc,
   nchains = 1,
-  niter = 18000,
-  nburnin= 6000,
+  niter = 20000,
+  nburnin= 5000,
   thin = 2,
   samplesAsCodaMCMC = T
 )

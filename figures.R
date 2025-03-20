@@ -1,4 +1,4 @@
-# Visualization code (Figures 1 and S1) for:
+# Visualization code (Figures 1, S9, and S10) for:
 # Supplemental feeding as a driver of population expansion and morphological change in Anna’s Hummingbirds
 
 # NM Alexandre, FG Romero, SG English, E Grames, F Garzón-Agudelo, K Epperly, T Barnes, DR Powers, 
@@ -15,6 +15,16 @@ library(nimble)
 library(ggpubr)
 library(magick)
 library(gridExtra)
+
+thm_obj <- theme(
+  axis.text = element_text(size = 11),
+  panel.background = element_blank(),
+  strip.text = element_text(size = 12),
+  axis.line = element_line(colour = "black"),
+  legend.title = element_text(vjust = 2.5, size = 13, hjust = 1),
+  legend.text = element_text(face = "bold"),
+  legend.background = element_blank()
+)
 
 ##### LOAD DATA #############################################################################################
 
@@ -149,16 +159,92 @@ counties <- map_data("county") %>%
 
 ##### VISUALIZATION #########################################################################################
 
-thm_obj <- theme(
-  axis.text = element_text(size = 11),
-  panel.background = element_blank(),
-  strip.text = element_text(size = 12),
-  axis.line = element_line(colour = "black"),
-  legend.title = element_text(vjust = 2.5, size = 13, hjust = 1),
-  legend.text = element_text(face = "bold"),
-  legend.background = element_blank()
-)
+##### PERCENT CHANGE IN MARGINAL EFFECTS
+######### FIGURE 1A
+lt_map <- ggplot()+
+  geom_spatvector(data = counties, fill = "#FFFFF2")+
+  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
+                  aes(fill = pct_change_yr), na.rm = T)+
+  scale_fill_viridis_c(na.value = "transparent", 
+                       name = "Change in abundance from\nyear-by-latitude effect",
+                       breaks = seq(0,150,50), labels = paste0(seq(0,150,50),"%"), limits = c(0,175))+
+  thm_obj+
+  # annotation_raster(as.raster(image_read("./yr.png")), -123.25, -121, 33.5, 34.9)+
+  annotate("text", x = -124, y = 33, label = "bold(A)", parse = T, size = 8)+
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.725, 0.7),
+        axis.text.y = element_text(size = 13),
+        axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_blank(),
+        panel.spacing = unit(0, "cm"),
+        plot.margin = margin(t=0, r=0, b=0, l=0, unit = "mm"))
 
+######### FIGURE 1B
+hp_map <- ggplot()+
+  geom_spatvector(data = counties, fill = "#FFFFF2")+
+  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
+                  aes(fill = pct_change_pop), na.rm = T)+
+  scale_fill_viridis_c(na.value = "transparent", 
+                       name = "Change in abundance from\nchange in human population",
+                       breaks = seq(0,60,15), labels = paste0(seq(0,60,15),"%"), limits = c(0,60))+
+  thm_obj+
+  annotate("text", x = -124, y = 33, label = "bold(B)", parse = T, size = 8)+
+  # annotation_raster(as.raster(image_read("./hp.png")), -123.25, -121.25, 33.35, 35.25)+
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.725, 0.7),
+        axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.spacing = unit(0, "cm"),
+        plot.margin = margin(t=0, r=0, b=0, l=0, unit = "mm"))
+
+######### FIGURE 1C
+fa_map <- ggplot()+
+  geom_spatvector(data = counties, fill = "#FFFFF2")+
+  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
+                  aes(fill = pct_change_fa), na.rm = T)+
+  scale_fill_viridis_c(na.value = "transparent", 
+                       name = "Change in abundance from\nchange in feeder availability",
+                       breaks = seq(0,125,25), labels = paste0(seq(0,125,25),"%"), limits = c(0,125))+
+  thm_obj+
+  annotate("text", x = -124, y = 33, label = "bold(C)", parse = T, size = 8)+
+  # annotation_raster(as.raster(image_read("./fa.png")), -123.25, -121.25, 33.25, 35.25)+
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.725, 0.7),
+        axis.title = element_blank(),
+        axis.text.y = element_text(size = 13),
+        axis.text.x = element_text(size = 13, hjust = 2/3),
+        panel.spacing = unit(0, "cm"),
+        plot.margin = margin(t=0, r=2, b=0, l=-10, unit = "mm"))
+
+######### FIGURE 1D
+ea_map <- ggplot()+
+  geom_spatvector(data = counties, fill = "#FFFFF2")+
+  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
+                  aes(fill = pct_change_ea), na.rm = T)+
+  scale_fill_viridis_c(na.value = "transparent", 
+                       name = "\nChange in abundance from\nchange in Eucalytpus\navailability",
+                       breaks = seq(0,1.5,0.3), labels = paste0(seq(0,1.5,0.3),"%"), limits = c(0,1.5))+
+  thm_obj+
+  # annotation_raster(as.raster(image_read("./ea.png")), -123.25, -121.25, 33.25, 34.75)+
+  annotate("text", x = -124, y = 33, label = "bold(D)", parse = T, size = 8)+
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.725, 0.7),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.x = element_text(size = 13, hjust = 2/3),
+        panel.spacing = unit(0, "cm"),
+        plot.margin = margin(t=0, r=2, b=0, l=-10, unit = "mm"))
+
+######### FIGURE 1
+ggarrange(plotlist = list(lt_map,hp_map,fa_map,ea_map), ncol = 2, nrow = 2, align = "hv")
+
+######### FIGURE S9
 # check main effects, excluding intercept, dispersion, smoothing parameters
 ggplot(filter(main_result_summary, !str_detect(Term, "(sd)|(_in)|(_ef)|(Rn)|(bayes)")),
        aes(x = Term_name, y = mean, colour = signif))+
@@ -175,82 +261,13 @@ ggplot(filter(main_result_summary, !str_detect(Term, "(sd)|(_in)|(_ef)|(Rn)|(bay
   theme(axis.text = element_text(face = "bold"),
         axis.title = element_text(size = 13, face = "bold"))
 
-##### PERCENT CHANGE IN MARGINAL EFFECTS
-lt_map <- ggplot()+
+######### FIGURE S10
+ggplot()+
   geom_spatvector(data = counties, fill = "#FFFFF2")+
-  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
-                  aes(fill = pct_change_yr), na.rm = T)+
-  scale_fill_viridis_c(na.value = "transparent", 
-                       name = "Change in expected\ncount due to marginal\nyear-by-latitude effect",
-                       breaks = seq(0,150,50), labels = paste0(seq(0,150,50),"%"), limits = c(0,175))+
-  thm_obj+
-  # annotation_raster(as.raster(image_read("./yr.png")), -123.25, -121, 33.5, 34.9)+
-  annotate("text", x = -124, y = 33, label = "bold(A)", parse = T, size = 8)+
+  geom_spatraster(data = baseline_map, aes(fill = mean_Baseline), na.rm = T)+
+  scale_fill_viridis_c(na.value = "transparent", name = "Expected counts of\nAnna's hummingbirds",
+                       breaks = seq(0,125,25), labels = seq(0,125,25), limits = c(0,125))+
   theme(legend.position = "inside",
-        legend.position.inside = c(.8, .75),
-        axis.text.y = element_text(size = 13),
-        axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.line.x = element_blank(),
-        panel.spacing = unit(0, "cm"),
-        plot.margin = margin(t=0, r=0, b=0, l=0, unit = "mm"))
-
-ea_map <- ggplot()+
-  geom_spatvector(data = counties, fill = "#FFFFF2")+
-  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
-                  aes(fill = pct_change_ea), na.rm = T)+
-  scale_fill_viridis_c(na.value = "transparent", 
-                       name = "Change in expected\ncount from change in\neucalytpus availability",
-                       breaks = seq(0,1.5,0.3), labels = paste0(seq(0,1.5,0.3),"%"), limits = c(0,1.5))+
-  thm_obj+
-  # annotation_raster(as.raster(image_read("./ea.png")), -123.25, -121.25, 33.25, 34.75)+
-  annotate("text", x = -124, y = 33, label = "bold(D)", parse = T, size = 8)+
-  theme(legend.position = "inside",
-        legend.position.inside = c(.8, .75),
-        axis.title = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.line.y = element_blank(),
-        axis.text.x = element_text(size = 13, hjust = 2/3),
-        panel.spacing = unit(0, "cm"),
-        plot.margin = margin(t=0, r=2, b=0, l=-10, unit = "mm"))
-
-fa_map <- ggplot()+
-  geom_spatvector(data = counties, fill = "#FFFFF2")+
-  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
-                  aes(fill = pct_change_fa), na.rm = T)+
-  scale_fill_viridis_c(na.value = "transparent", 
-                       name = "Change in expected\ncount from change\nin feeder availability",
-                       breaks = seq(0,125,25), labels = paste0(seq(0,125,25),"%"), limits = c(0,125))+
-  thm_obj+
-  annotate("text", x = -124, y = 33, label = "bold(C)", parse = T, size = 8)+
-  # annotation_raster(as.raster(image_read("./fa.png")), -123.25, -121.25, 33.25, 35.25)+
-  theme(legend.position = "inside",
-        legend.position.inside = c(.8, .75),
-        axis.title = element_blank(),
-        axis.text.y = element_text(size = 13),
-        axis.text.x = element_text(size = 13, hjust = 2/3),
-        panel.spacing = unit(0, "cm"),
-        plot.margin = margin(t=0, r=2, b=0, l=-10, unit = "mm"))
-
-hp_map <- ggplot()+
-  geom_spatvector(data = counties, fill = "#FFFFF2")+
-  geom_spatraster(data = filter(change_map, Min_year < 1980, Max_year > 2015),
-                  aes(fill = pct_change_pop), na.rm = T)+
-  scale_fill_viridis_c(na.value = "transparent", 
-                       name = "Change in expected\ncount from change\nin human population",
-                       breaks = seq(0,60,15), labels = paste0(seq(0,60,15),"%"), limits = c(0,60))+
-  thm_obj+
-  annotate("text", x = -124, y = 33, label = "bold(B)", parse = T, size = 8)+
-  # annotation_raster(as.raster(image_read("./hp.png")), -123.25, -121.25, 33.35, 35.25)+
-  theme(legend.position = "inside",
-        legend.position.inside = c(.8, .75),
-        axis.title = element_blank(),
-        axis.line = element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.spacing = unit(0, "cm"),
-        plot.margin = margin(t=0, r=0, b=0, l=0, unit = "mm"))
-
-ggarrange(plotlist = list(lt_map,hp_map,fa_map,ea_map), ncol = 2, nrow = 2, align = "hv")
+        legend.position.inside = c(0.7, 0.7),
+        legend.title = element_text(vjust = 2.5, hjust = 1))+
+  thm_obj
